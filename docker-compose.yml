@@ -1,0 +1,13 @@
+version: "3.7"
+services:
+  mongo:
+    image: mongo
+    volumes:
+     - ./mongo:/data/db
+  api:
+    build: ./api
+    volumes:
+      - ./api:/usr/src/app
+    ports:
+      - "24420:24420"
+
