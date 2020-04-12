@@ -10,4 +10,3 @@ services:
       - ./api:/usr/src/app
     ports:
       - "24420:24420"
-
