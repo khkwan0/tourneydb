@@ -22,6 +22,7 @@ class TournamentsScreen extends Component {
   }
 
   render() {
+//    console.log(this.props.initialPosition)
     return(
       <LinearGradient start={{x:0, y:1}} end={{x:1, y:0}} colors={['purple', '#3b5998', '#192f6a']} style={{flex:1}}>
         <View style={{alignItems: 'center', marginTop:'20%'}}>
@@ -36,7 +37,7 @@ class TournamentsScreen extends Component {
             <View key={tourney._id} style={{marginTop:10}}>
               <Card style={{backgroundColor: 'black'}}>
                 <Card.Content>
-                  <Title style={{color:'white'}}>{tourney.location.name}</Title>
+                  <Title style={{color:'white', fontFamily:'NunitoSan-Bold'}}>{tourney.location.name}</Title>
                   <Paragraph style={{color:'white'}}>
                     {}
                   </Paragraph>
