@@ -10,6 +10,7 @@
   "license": "ISC",
   "dependencies": {
     "fastify": "^2.13.0",
+    "moment-timezone": "^0.5.28",
     "monk": "^7.1.2"
   }
 }
