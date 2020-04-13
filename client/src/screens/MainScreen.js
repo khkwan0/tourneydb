@@ -13,6 +13,7 @@ class MainScreen extends Component {
   }
 
   componentDidMount = () => {
+    /*
     Geolocation.getCurrentPosition(
       position => {
         const initialPosition = JSON.stringify(position)
@@ -25,6 +26,7 @@ class MainScreen extends Component {
         this.setState({lastPosition})
       })
     )
+    */
   }
 
   render() {
