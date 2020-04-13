@@ -21,6 +21,7 @@ class TournamentsScreen extends Component {
       console.log(e)
     }
     this._unsubscribe = this.props.navigation.addListener('focus', async () => {
+      console.log('hre')
       await this.getDataFromServer()
     })
   }
