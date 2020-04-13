@@ -16,18 +16,28 @@ class TournamentsScreen extends Component {
 
   componentDidMount = async () => {
     try {
-      await this.getDataFromServer()
+      let res = await this.getDataFromServer()
+      this.setState({loading: false, tournaments: res, show_details: false})
     } catch(e) {
       console.log(e)
+      this.setState({loading: false})
     }
     this._unsubscribe = this.props.navigation.addListener('focus', async () => {
-      this.setState({show_details: false})
-      await this.getDataFromServer()
+      console.log('focus')
+      this.setState({show_details: false, loading: true}, async () => {
+      try {
+        let res = await this.getDataFromServer()
+        console.log('returned')
+        this.setState({loading: false, tournaments: res})
+      } catch(e) {
+        console.log(e)
+        this.setState({loading: false})
+      }
+      })
     })
   }
 
   getDataFromServer = async () => {
-    this.setState({loading: true})
     try {
       let res_raw = await fetch('https://api.pubgamesdb.com/' + this.props.route.params.game, {
         method:'GET',
@@ -37,10 +47,7 @@ class TournamentsScreen extends Component {
       })
       let res = await res_raw.json()
       if (res.err === 0) {
-        this.setState({
-          tournaments: res.msg,
-          loading: false
-        })
+        return res.msg
       } else {
         throw new Error({code: res.err, msg: res.msg})
       }
@@ -119,7 +126,7 @@ class TournamentsScreen extends Component {
             </View>
           </View>
         }
-        {this.state.show_details &&
+        {this.state.show_details && !this.state.loading &&
          <MyPseudoModal /> 
         }
       </LinearGradient>
