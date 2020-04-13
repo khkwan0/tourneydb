@@ -1,17 +1,16 @@
 import React, {Component} from 'react'
-import {View, Text, Button} from 'react-native'
+import {View, Text, Button, Modal, StyleSheet, ActivityIndicator} from 'react-native'
 import {Card, Title, Paragraph} from 'react-native-paper'
 import moment from 'moment-timezone'
 import LinearGradient from 'react-native-linear-gradient'
-import { useFocusEffect } from '@react-navigation/native'
-import { TapGestureHandler } from 'react-native-gesture-handler'
 
 class TournamentsScreen extends Component {
 
   state = {
     tournaments: [],
     show_details: false,
-    idx: -1
+    idx: -1,
+    loading: true,
   }
 
   componentDidMount = async () => {
@@ -26,6 +25,7 @@ class TournamentsScreen extends Component {
   }
 
   getDataFromServer = async () => {
+    this.setState({loading: true})
     try {
       let res_raw = await fetch('https://api.pubgamesdb.com/' + this.props.route.params.game, {
         method:'GET',
@@ -36,7 +36,8 @@ class TournamentsScreen extends Component {
       let res = await res_raw.json()
       if (res.err === 0) {
         this.setState({
-          tournaments: res.msg
+          tournaments: res.msg,
+          loading: false
         })
       } else {
         throw new Error({code: res.err, msg: res.msg})
@@ -63,7 +64,12 @@ class TournamentsScreen extends Component {
 //    console.log(this.props.initialPosition)
     return(
       <LinearGradient start={{x:0, y:1}} end={{x:1, y:0}} colors={['purple', '#3b5998', '#192f6a']} style={{flex:1}}>
-        {!this.state.show_details &&
+        {this.state.loading &&
+          <View style={{flex: 1,justifyContent: 'center', alignItems: 'center'}}>
+            <ActivityIndicator size="large" color="#ffffff" />
+          </View>
+        }
+        {!this.state.show_details && !this.state.loading &&
           <View>
             <View style={{alignItems: 'center', marginTop:'20%'}}>
               <Text style={{color:'white', fontSize:40, fontFamily:'PassionOne-Regular'}}>shootahs</Text>
@@ -90,15 +96,28 @@ class TournamentsScreen extends Component {
             </View>
           </View>
         }
-        {this.state.show_details &&
-          <View>
+        {this.state.show_details && !this.state.loading &&
+        <View style={['styles.centeredView', 'styles.modal']}>
             <Text>{this.state.tournaments[this.state.idx].location.name}</Text>
             <Button title="Go Back" onPress={this.hideDetails} />
-          </View>
+        </View>
         }
       </LinearGradient>
     )
   }
 }
+
+const styles = StyleSheet.create({
+  centeredView: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center'
+  },
+  modal: {
+    height: '80%',
+    width: '80%',
+    backgroundColor: 'rgba(0,0,0,0.5)'
+  }
+})
 
 export default TournamentsScreen
