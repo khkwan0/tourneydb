@@ -39,7 +39,10 @@ class TournamentsScreen extends Component {
                 <Card.Content>
                   <Title style={{color:'white', fontFamily:'NunitoSan-Bold'}}>{tourney.location.name}</Title>
                   <Paragraph style={{color:'white'}}>
-                    {}
+                    <View>{tourney.type}</View>
+                    <View>{momemt.tz(tourney.start_time).format('ddd Do')}</View>
+                    <View>{tourney.fee}</View>
+                    <View>{tourney.max}</View>
                   </Paragraph>
                 </Card.Content>
               </Card>
