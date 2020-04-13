@@ -3,6 +3,8 @@ import {View, Text, Button} from 'react-native'
 import {Card, Title, Paragraph} from 'react-native-paper'
 import moment from 'moment-timezone'
 import LinearGradient from 'react-native-linear-gradient'
+import { useFocusEffect } from '@react-navigation/native'
+import { TapGestureHandler } from 'react-native-gesture-handler'
 
 class TournamentsScreen extends Component {
 
@@ -18,6 +20,10 @@ class TournamentsScreen extends Component {
     } catch(e) {
       console.log(e)
     }
+    this._unsubscribe = this.props.navigation.addListener('focus', async () => {
+      console.log('hre')
+      await this.getDataFromServer()
+    })
   }
 
   getDataFromServer = async () => {
