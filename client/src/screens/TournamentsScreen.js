@@ -1,5 +1,6 @@
 import React, {Component} from 'react'
-import {View, Text, Button, Modal, StyleSheet, ActivityIndicator} from 'react-native'
+import {View, Text, TouchableOpacity, StyleSheet, ActivityIndicator} from 'react-native'
+import Modal from 'react-native-modal'
 import {Card, Title, Paragraph} from 'react-native-paper'
 import moment from 'moment-timezone'
 import LinearGradient from 'react-native-linear-gradient'
@@ -20,6 +21,7 @@ class TournamentsScreen extends Component {
       console.log(e)
     }
     this._unsubscribe = this.props.navigation.addListener('focus', async () => {
+      this.setState({show_details: false})
       await this.getDataFromServer()
     })
   }
@@ -62,6 +64,27 @@ class TournamentsScreen extends Component {
 
   render() {
 //    console.log(this.props.initialPosition)
+    const MyPseudoModal = () => {
+      const tourney = this.state.tournaments[this.state.idx]
+      return(
+        <View style={styles.centeredView}>
+          <View style={styles.modal}>
+            <View style={{flexGrow: 1, justifyContent: 'center', alignItems: 'center', height: '80%'}}>
+              <View>
+                <Text style={{color:'white'}}>{tourney.location.name}</Text>
+              </View>
+            </View>
+            <View style={{flex: 1, alignItems: 'center'}}>
+                <TouchableOpacity onPress={this.hideDetails} style={styles.modalButtonWide}>
+                  <View>
+                    <Text style={{color:'white'}}>CLOSE</Text>
+                  </View>
+                </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      )
+    }
     return(
       <LinearGradient start={{x:0, y:1}} end={{x:1, y:0}} colors={['purple', '#3b5998', '#192f6a']} style={{flex:1}}>
         {this.state.loading &&
@@ -96,11 +119,8 @@ class TournamentsScreen extends Component {
             </View>
           </View>
         }
-        {this.state.show_details && !this.state.loading &&
-        <View style={['styles.centeredView', 'styles.modal']}>
-            <Text>{this.state.tournaments[this.state.idx].location.name}</Text>
-            <Button title="Go Back" onPress={this.hideDetails} />
-        </View>
+        {this.state.show_details &&
+         <MyPseudoModal /> 
         }
       </LinearGradient>
     )
@@ -108,15 +128,25 @@ class TournamentsScreen extends Component {
 }
 
 const styles = StyleSheet.create({
-  centeredView: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center'
-  },
   modal: {
     height: '80%',
     width: '80%',
-    backgroundColor: 'rgba(0,0,0,0.5)'
+    borderRadius: 40,
+    backgroundColor: 'rgba(10,10,10,0.8)',
+  },
+  centeredView: {
+    height: '100%',
+    width: '100%',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  modalButtonWide: {
+    width: '50%',
+    backgroundColor: 'blue',
+    height: 30,
+    borderRadius: 20,
+    justifyContent: 'center',
+    alignItems: 'center'
   }
 })
 
