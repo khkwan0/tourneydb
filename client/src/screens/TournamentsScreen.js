@@ -36,14 +36,12 @@ class TournamentsScreen extends Component {
           return(
             <View key={tourney._id} style={{marginTop:10}}>
               <Card style={{backgroundColor: 'black'}}>
-                <Card.Content>
+                <Card.Content style={{color:'white'}}>
                   <Title style={{color:'white', fontFamily:'NunitoSan-Bold'}}>{tourney.location.name}</Title>
-                  <Paragraph style={{color:'white'}}>
-                    <View>{tourney.type}</View>
-                    <View>{momemt.tz(tourney.start_time).format('ddd Do')}</View>
-                    <View>{tourney.fee}</View>
-                    <View>{tourney.max}</View>
-                  </Paragraph>
+                  <Paragraph style={{color:'white'}}>{tourney.type}</Paragraph>
+                  <Paragraph style={{color:'white'}}>{moment.tz(tourney.start_time, 'Asia/Bangkok').format('ddd Do')}</Paragraph>
+                  <Paragraph style={{color:'yellow'}}>{tourney.fee}</Paragraph>
+                  <Paragraph style={{color:'white'}}>{tourney.max}</Paragraph>
                 </Card.Content>
               </Card>
             </View>
