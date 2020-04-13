@@ -108,7 +108,7 @@ class TournamentsScreen extends Component {
                     <Card.Content style={{color:'white'}}>
                       <Title style={{color:'white', fontFamily:'NunitoSan-Bold'}}>{tourney.location.name}</Title>
                       <Paragraph style={{color:'white'}}>{tourney.type}</Paragraph>
-                      <Paragraph style={{color:'white'}}>{moment.tz(tourney.start_time, 'Asia/Bangkok').format('ddd Do')}</Paragraph>
+                      <Paragraph style={{color:'white'}}>{moment.tz(tourney.start_time, 'Asia/Bangkok').format('ddd MMM Do')}</Paragraph>
                       <Paragraph style={{color:'yellow'}}>{tourney.fee}</Paragraph>
                       <Paragraph style={{color:'white'}}>{tourney.max}</Paragraph>
                     </Card.Content>
