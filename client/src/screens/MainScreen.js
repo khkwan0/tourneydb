@@ -13,6 +13,7 @@ class MainScreen extends Component {
   };
 
   componentDidMount = () => {
+    /*
     Geolocation.getCurrentPosition(
       position => {
         const initialPosition = JSON.stringify(position);
@@ -20,11 +21,12 @@ class MainScreen extends Component {
         this.setState({initialPosition});
       },
       error => console.log(error),
-      (this.watchID = Geolocation.watchPosition(position => {
-        const lastPosition = JSON.stringify(position);
-        this.setState({lastPosition});
-      })),
-    );
+      this.watchID = Geolocation.watchPosition(position => {
+        const lastPosition = JSON.stringify(position)
+        this.setState({lastPosition})
+      })
+    )
+    */
   };
 
   render() {
