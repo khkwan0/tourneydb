@@ -5,6 +5,7 @@ import moment from 'moment-timezone';
 import LinearGradient from 'react-native-linear-gradient';
 import {useFocusEffect} from '@react-navigation/native';
 import {TapGestureHandler} from 'react-native-gesture-handler';
+import {globalStyles} from '../styles/Global';
 
 class TournamentsScreen extends Component {
   state = {
@@ -71,37 +72,37 @@ class TournamentsScreen extends Component {
         style={{flex: 1}}>
         {!this.state.show_details && (
           <View>
-            <View style={styles.headingContainer}>
-              <Text style={styles.headingText}>shootahs</Text>
+            <View style={styles.logoContainer}>
+              <Text style={styles.logoText}>shootahs</Text>
             </View>
-            <View style={styles.subheadingContainer}>
-              <Text style={styles.subheadingText}>
+            <View style={globalStyles.headingContainer}>
+              <Text style={globalStyles.headingText}>
                 {this.props.route.params.game} BALL TOURNAMENTS
               </Text>
             </View>
-            <View style={styles.listContainer}>
+            <View style={globalStyles.container}>
               {this.state.tournaments.map((tourney, idx) => {
                 return (
-                  <View key={tourney._id} style={styles.listItemContainer}>
+                  <View key={tourney._id}>
                     <Card
-                      style={styles.listItem}
+                      style={globalStyles.item}
                       onPress={() => this.showDetails(idx)}>
-                      <Card.Content style={styles.listItemText}>
-                        <Title style={styles.listItemTitle}>
+                      <Card.Content>
+                        <Title style={globalStyles.title}>
                           {tourney.location.name}
                         </Title>
-                        <Paragraph style={styles.listItemText}>
+                        <Paragraph style={globalStyles.paragraph}>
                           {tourney.type}
                         </Paragraph>
-                        <Paragraph style={styles.listItemText}>
+                        <Paragraph style={globalStyles.paragraph}>
                           {moment
                             .tz(tourney.start_time, 'Asia/Bangkok')
                             .format('ddd Do')}
                         </Paragraph>
-                        <Paragraph style={styles.listItemText}>
+                        <Paragraph style={globalStyles.paragraph}>
                           {tourney.fee}
                         </Paragraph>
-                        <Paragraph style={styles.listItemText}>
+                        <Paragraph style={globalStyles.paragraph}>
                           {tourney.max}
                         </Paragraph>
                       </Card.Content>
@@ -126,41 +127,13 @@ class TournamentsScreen extends Component {
 export default TournamentsScreen;
 
 const styles = StyleSheet.create({
-  headingContainer: {
+  logoContainer: {
     alignItems: 'center',
-    marginTop: '20%',
+    padding: 30,
   },
-  headingText: {
-    color: 'white',
-    fontSize: 40,
+  logoText: {
     fontFamily: 'PassionOne-Regular',
-  },
-
-  subheadingContainer: {
-    alignItems: 'center',
-    marginTop: 8,
-  },
-  subheadingText: {
-    color: 'white',
-    fontSize: 15,
-  },
-
-  listContainer: {
-    marginTop: 20,
-    marginLeft: 20,
-    marginRight: 20,
-  },
-  listItemContainer: {
-    marginTop: 10,
-  },
-  listItem: {
-    backgroundColor: 'black',
-  },
-  listItemTitle: {
-    color: 'white',
-    fontFamily: 'NunitoSans-Black',
-  },
-  listItemText: {
+    fontSize: 40,
     color: 'white',
   },
 });
