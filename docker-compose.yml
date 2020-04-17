@@ -10,3 +10,7 @@ services:
       - ./api:/usr/src/app
     ports:
       - "24420:24420"
+  admin:
+    build: ./admin
+    volumes:
+      - ./admin:/usr/src/app

@@ -1,26 +1,30 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React from 'react'
+import { useDispatch, useSelector, shallowEqual } from 'react-redux'
+import {verifyToken} from './redux/actions/authActions'
+import MainScreen from './MainScreen'
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+const App = () => {
+  const user = useSelector(state => ({user:state.userData.user}), shallowEqual)
+  console.log(user)
+  const dispatch = useDispatch()
+
+  console.log('token check')
+  React.useEffect(() => {
+    async function _verifyToken()  {
+      dispatch(verifyToken())
+    }
+    _verifyToken()
+  }, [])
+
+   
+  return(
+    <div>
+    {/*
+      <Login />      
+      */}
+      <MainScreen />
     </div>
-  );
+  )
 }
 
-export default App;
+export default App

@@ -10,7 +10,9 @@
   "license": "ISC",
   "dependencies": {
     "fastify": "^2.13.0",
+    "fastify-cors": "^3.0.3",
     "moment-timezone": "^0.5.28",
-    "monk": "^7.1.2"
+    "monk": "^7.1.2",
+    "uuid": "^7.0.3"
   }
 }
