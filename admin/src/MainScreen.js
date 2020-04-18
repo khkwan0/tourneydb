@@ -106,6 +106,13 @@ export default function MainScreen() {
     setOpen(false);
   };
 
+  React.useEffect(() => {
+    return () => {
+      console.log('component will unmount')
+    }
+  }, [])
+  
+  console.log('render')
   return (
     <div className={classes.root}>
       <CssBaseline />
@@ -154,7 +161,7 @@ export default function MainScreen() {
         <List>
           {['Home', 'Location', 'Tournaments'].map((text, index) => (
             <ListItem button key={text}>
-              <ListItemIcon>{index % 2 === 0 ? <InboxIcon /> : <MailIcon />}</ListItemIcon>
+              <ListItemIcon onClick={() => setScreen(text)} >{index % 2 === 0 ? <InboxIcon /> : <MailIcon />}</ListItemIcon>
               <ListItemText primary={text} onClick={() => setScreen(text)} />
             </ListItem>
           ))}

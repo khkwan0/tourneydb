@@ -12,9 +12,13 @@ const LocationDetails = (props) => {
     props.handleSave(details)
   }
 
+  const handleCancel = () => {
+    props.handleCancel()
+  }
+
   return (
     <div>
-      <TextField variant="outlined" label="location_id" value={details.id} disabled={true} />
+      <TextField variant="outlined" label="location_id" value={details._id} disabled={true} />
       <TextField variant="outlined" label="Name" name="name" value={details.name} onChange={(e) => handleChange(e)} />
       <TextField variant="outlined" label="Addr1" name="addr1" value={details.addr1} onChange={(e) => handleChange(e)} />
       <TextField variant="outlined" label="Addr2" name="addr2" value={details.addr2} onChange={(e) => handleChange(e)} />
@@ -25,8 +29,8 @@ const LocationDetails = (props) => {
       <TextField variant="outlined" label="Phone" name="phone" value={details.phone} onChange={(e) => handleChange(e)} />
       <TextField variant="outlined" label="Social" name="social" value={details.social} onChange={(e) => handleChange(e)} />
       <TextField variant="outlined" label="Email" name="email" value={details.email} onChange={(e) => handleChange(e)} />
-      <Button>Cancel</Button>
-      <Button onClick={handleSave}>Save</Button>
+      <Button variant="contained" color="secondary" onClick={handleCancel}>Cancel</Button>
+      <Button variant="contained" color="primary" onClick={handleSave}>Save</Button>
     </div>
   )
 }
