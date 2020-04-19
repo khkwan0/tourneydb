@@ -39,7 +39,7 @@ class TournamentsScreen extends Component {
 
   getDataFromServer = async () => {
     try {
-      let res_raw = await fetch('https://api.pubgamesdb.com/' + this.props.route.params.game, {
+      let res_raw = await fetch('https://api.pubgamesdb.com/games' + this.props.route.params.game, {
         method:'GET',
         headers: {
           'Accept': 'application/json'
