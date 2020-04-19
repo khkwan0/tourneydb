@@ -5,7 +5,8 @@ const INITIAL_STATE = {
     _id: null,
     email: null,
     level: 0,
-    locations: []
+    locations: [],
+    token: null,
   }
 }
 
@@ -16,6 +17,11 @@ export default (state = INITIAL_STATE, action) => {
       return {
         ...state,
         user: action.payload
+      }
+    case TYPES.RESET_USER:
+      return {
+        ...state,
+        user: INITIAL_STATE
       }
     default: return state
   }

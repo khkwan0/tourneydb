@@ -6,19 +6,18 @@ import {TextField} from '@material-ui/core'
 
 const Login = () => {
 
-  const [isSending, setIsSending] = React.useState(false)
+//  const [isSending, setIsSending] = React.useState(false)
   const [email, setEmail] = React.useState('')
   const [password, setPassword] = React.useState('')
 
   const dispatch = useDispatch()
-
+/*
   const login = React.useCallback(async () => {
-    if (isSending) {
-      return
-      }
     setIsSending(true)
-    dispatch(doLogin('ken', 'khkwan0'))
-  }, [isSending])
+    console.log(email,password)
+    dispatch(doLogin(email, password))
+  }, [isSending,dispatch])
+  */
 
   const handleEmail = (e) => {
     setEmail(e.target.value)
@@ -27,18 +26,22 @@ const Login = () => {
   const handlePassword = (e) => {
     setPassword(e.target.value)
   }
+
+  const handleLogin = () => {
+    console.log(email, password)
+      dispatch(doLogin(email, password))
+  }
+
   return(
-    <div style={{display:'flex',justifyContent:'center',alignItems:'center'}}>
-      <div style={{height:'100%'}}>
-        <div>
-          <TextField name="email" label="Email" onChange={(e) => handleEmail(e)} value={email} />
-        </div>
-        <div>
-          <TextField name="password" label="Password" onChange={(e) => handlePassword(e)} value={password} />
-        </div>
-        <div>
-          <Button onClick={login}>Login</Button>
-        </div>
+    <div>
+      <div>
+        <TextField name="email" label="Email" onChange={(e) => handleEmail(e)} value={email} />
+      </div>
+      <div>
+        <TextField name="password" label="Password" onChange={(e) => handlePassword(e)} value={password} type="password" />
+      </div>
+      <div>
+        <Button onClick={handleLogin}>Login</Button>
       </div>
     </div>
   )

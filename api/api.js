@@ -39,11 +39,13 @@ d.post('/login', async (req, reply) => {
   try {
     if (typeof req.body !== 'undefined' && typeof req.body.email!== 'undefined' && typeof req.body.password !== 'undefined') {
       let query = {email: req.body.email.toLowerCase(), password: req.body.password}
-      await verifyUser('admin', query)
+      console.log(query)
+      const res = await verifyUser('admins', query)
+      console.log('res',res)
       if (res.length === 1) {
         let payload = {
           user: res,
-          token: token
+          token: res.token
         }
         reply.code(200).send({err: 0, msg: payload})
       } else {
@@ -154,11 +156,11 @@ d.post('/tournament', async (req, reply) => {
 // there should be only one user per email/token
 verifyUser = async (collection = 'admins', query = {}) => {
   try {
-    let collection = db.get('collection')
-    let res = collection.find(query, {password: 0})
+    const _collection = db.get(collection)
+    let res = await _collection.find(query, '-password')
     if (res.length === 1) {
       let token = uuid.v4()
-      await collection.update({_id: res[0]._id}, {$set: {token: token}})
+      await _collection.update({_id: res[0]._id}, {$set: {token: token}})
       res[0].token = token
       return res
     } else {

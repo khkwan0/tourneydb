@@ -118,7 +118,6 @@ export default function MainScreen(props) {
     props.handleLogout()
   }
   
-  console.log('render')
   return (
     <div className={classes.root}>
       <CssBaseline />
@@ -178,7 +177,7 @@ export default function MainScreen(props) {
           {['Settings', 'Logout'].map((text, index) => (
             <ListItem button key={text}>
               {text === "Settings" && <ListItemIcon onClick={() => {}}><SettingsIcon /></ListItemIcon>}
-              {text === "Logout" && <ListItemIcon onClick={() => handleLogout}><LogoutIcon /></ListItemIcon>}
+              {text === "Logout" && <ListItemIcon onClick={() => handleLogout()}><LogoutIcon /></ListItemIcon>}
               <ListItemText primary={text} />
             </ListItem>
           ))}
