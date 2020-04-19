@@ -30,6 +30,8 @@ const LocationDetails = (props) => {
       <TextField variant="outlined" label="State" name="state" value={details.state} onChange={(e) => handleChange(e)} />
       <TextField variant="outlined" label="Country" name="country" value={details.country} onChange={(e) => handleChange(e)} />
       <TextField variant="outlined" label="Zip" name="zip" value={details.zip} onChange={(e) => handleChange(e)} />
+      <TextField variant="outlined" label="Latitude" name="latitude" value={details.latitude} onChange={(e) => handleChange(e)} />
+      <TextField variant="outlined" label="Longitude" name="longitude" value={details.longitude} onChange={(e) => handleChange(e)} />
       <TextField variant="outlined" label="Phone" name="phone" value={details.phone} onChange={(e) => handleChange(e)} />
       <TextField variant="outlined" label="Social" name="social" value={details.social} onChange={(e) => handleChange(e)} />
       <TextField variant="outlined" label="Email" name="email" value={details.email} onChange={(e) => handleChange(e)} />

@@ -10,7 +10,7 @@ const db = new monk('tourneydb_mongo_1/tourneydb')
 d.addHook('preHandler', async (req, reply, done) => {
     console.log(req.raw.url)
   try {
-    if (req.raw.method === 'GET') {
+    if (req.raw.method === 'GET' || req.raw.url === '/login' || req.raw.url === '/verify') {
       return
     } else {
       if (typeof req.body.token !== 'undefined') {
@@ -119,6 +119,10 @@ d.post('/location', async (req, reply) => {
       const locations = db.get('locations')
       if (typeof req.body.location._id === 'undefined' || !req.body.location._id) {
         const location = req.body.location
+        location.coords = {
+          type: 'Point',
+          coordinates: [req.body.lng, req.body.lat]
+        }
         location.is_active = true
         delete location._id
         const res = await locations.insert(location)

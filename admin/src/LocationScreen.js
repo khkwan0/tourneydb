@@ -43,8 +43,8 @@ const LocationScreen = (props) => {
     social: '',
     email: '',
     coordinates: {
-      lat: 0,
-      lng: 0
+      type: 'Point',
+      coordinates: [0,0]
     }
   }
 
