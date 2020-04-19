@@ -4,12 +4,38 @@ const moment = require('moment-timezone')
 const uuid = require('uuid')
 
 d.register(require('fastify-cors'), {origin: 'https://admin.pubgamesdb.com', credentials: true})
-console.log(uuid.v4())
 
 const db = new monk('tourneydb_mongo_1/tourneydb')
 
-console.log(db)
-d.get('/:game', async (req, reply) => {
+d.addHook('preHandler', async (req, reply, done) => {
+    console.log(req.raw.url)
+  try {
+    if (req.raw.url === '/games' || req.raw.url === '/login' || req.raw.url === '/verify') {
+      return
+    } else {
+      if (typeof req.body.token !== 'undefined') { 
+        const query = {token: req.body.token}
+        const admins = db.get('admins')
+        const res = await admin.find(query)
+        console.log(res)
+        let valid = false
+        if (res.length > 0) {
+          valid = true
+        }
+        if (valid) {
+          return
+        } else {
+          reply.code(403).send()
+        }
+      } else {
+        reply.code(403).send()
+      }
+    }
+  } catch(e) {
+  }
+})
+
+d.get('/games/:game', async (req, reply) => {
   try {
     let query = {game: req.params.game}
     const tournaments = db.get('tournaments')
@@ -28,7 +54,6 @@ d.get('/:game', async (req, reply) => {
       } 
       return tourney
     })
-    console.log(tourneys)
     reply.code(200).send({err: 0, msg: tourneys})
   } catch(e) {
     reply.code(500).send()
@@ -39,9 +64,7 @@ d.post('/login', async (req, reply) => {
   try {
     if (typeof req.body !== 'undefined' && typeof req.body.email!== 'undefined' && typeof req.body.password !== 'undefined') {
       let query = {email: req.body.email.toLowerCase(), password: req.body.password}
-      console.log(query)
       const res = await verifyUser('admins', query)
-      console.log('res',res)
       if (res.length === 1) {
         let payload = {
           user: res,
@@ -117,7 +140,6 @@ d.get('/tournaments/:loc_id', async (req, reply) => {
     try {
       const tournaments = db.get('tournaments')
       const res = await tournaments.find({location_id: req.params.loc_id, is_active:true})
-      console.log(res)
       reply.code(200).send({err: 0, msg: res}) 
     } catch(e) {
       console.log(e)
