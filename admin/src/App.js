@@ -1,26 +1,37 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React from 'react'
+import { useDispatch, useSelector, shallowEqual } from 'react-redux'
+import {verifyToken, logout} from './redux/actions/authActions'
+import MainScreen from './MainScreen'
+import Login from './Login'
+import config from './assets/configs/config'
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+const App = () => {
+  const store = useSelector(state => ({user:state.userData.user}), shallowEqual)
+  const dispatch = useDispatch()
+
+  React.useEffect(() => {
+      dispatch(verifyToken())
+  }, [dispatch])
+
+
+  const handleLogout = () => {
+    const key = config.storage.key.prefix + '/token'
+    localStorage.removeItem(key)
+    dispatch(logout())
+  } 
+
+  return(
+    <div>
+    {(typeof store.user === 'undefined' || !store.user._id) &&
+      <div style={{display: 'flex', justifyContent:'center'}}>
+        <Login />      
+      </div>
+    }
+    {typeof store.user !== 'undefined' && store.user._id &&
+      <MainScreen handleLogout={handleLogout} />
+    }
     </div>
-  );
+  )
 }
 
-export default App;
+export default App
