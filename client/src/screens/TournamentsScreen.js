@@ -80,6 +80,16 @@ class TournamentsScreen extends Component {
               <View>
                 <Text style={{color:'white'}}>{tourney.location.name}</Text>
               </View>
+              <View><Text style={{color:'white'}}>{tourney.location.addr1}</Text></View>
+              <View><Text style={{color:'white'}}>{tourney.location.addr2}</Text></View>
+              <View><Text style={{color:'white'}}>{tourney.location.city}</Text></View>
+              <View><Text style={{color:'white'}}>{tourney.location.state}</Text></View>
+              <View><Text style={{color:'white'}}>{tourney.location.zip}</Text></View>
+              <View><Text style={{color:'white'}}>{tourney.location.country}</Text></View>
+              <View><Text style={{color:'white'}}>{tourney.location.phone}</Text></View>
+              <View><Text style={{color:'white'}}>{tourney.location.email}</Text></View>
+              <View><Text style={{color:'white'}}>{tourney.location.messenger_id}</Text></View>
+              <View><Text style={{color:'white'}}>{tourney.rules}</Text></View>
             </View>
             <View style={{flex: 1, alignItems: 'center'}}>
                 <TouchableOpacity onPress={this.hideDetails} style={styles.modalButtonWide}>
@@ -111,14 +121,14 @@ class TournamentsScreen extends Component {
             {this.state.tournaments.map((tourney, idx) => {
               return(
                 <View key={tourney._id} style={{marginTop:10}}>
-                  <Card style={{backgroundColor: 'black'}} onPress={() => this.showDetails(idx)}>
-                    <Card.Content style={{color:'white'}}>
-                      <Title style={{color:'white', fontFamily:'NunitoSan-Bold'}}>{tourney.location.name}</Title>
-                      <Paragraph style={{color:'white'}}>{tourney.type}</Paragraph>
-                      <Paragraph style={{color:'white'}}>{moment.tz(tourney.start_time, 'Asia/Bangkok').format('ddd MMM Do @ h:mm a')}</Paragraph>
-                      <Paragraph style={{color:'yellow'}}>{tourney.fee}</Paragraph>
-                      <Paragraph style={{color:'white'}}>{tourney.max}</Paragraph>
-                    </Card.Content>
+                  <Card style={{backgroundColor: 'black'}} onPress={() => this.showDetails(idx)} title={tourney.location.name}>
+                    <View style={{width:'80%', display:'flex', paddingLeft:20, paddingTop: 20, paddingBottom:20}}>
+                      <View><Text style={{color:'white', fontSize: 30}}>{tourney.location.name}</Text></View>
+                      <View><Text style={{color:'white'}}>{tourney.type.toUpperCase()}</Text></View>
+                      <View><Text style={{color:'white'}}>{moment.tz(tourney.start_time, 'Asia/Bangkok').format('ddd MMM Do @ h:mm a')}</Text></View>
+                      <View><Text style={{color:'yellow'}}>{tourney.fee} {tourney.currency}</Text></View>
+                      <View style={{display:'flex', flexDirection:'row', justifyContent:'space-between' }}><Text style={{color:'white'}}>{tourney.max} players</Text><Text style={{color:'white'}}>Details</Text></View>
+                    </View>
                   </Card>
                 </View>
               )
