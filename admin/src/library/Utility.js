@@ -1,3 +1,5 @@
+import config from '../assets/configs/config'
+
 const Utility = {
   DeleteFromServer: async (endpoint, data) => {
     try {
@@ -18,7 +20,9 @@ const Utility = {
   },
   PostToServer: async (endpoint, data) => {
     try {
-      let res = await fetch(endpoint, {
+      const key = config.storage.key.prefix + '/token'
+      data.token = await localStorage.getItem(key)
+      const res = await fetch(endpoint, {
         method: "POST",
         credentials: "include",
         headers: {

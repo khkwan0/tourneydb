@@ -7,7 +7,7 @@ export const doLogin = (email, password) => {
     try {
       let res = await Utility.PostToServer(config.api.url + '/login', {email: email, password: password})
       if (res.err === 0) {
-        let key = config.storage.key.prefix + '/token'
+        const key = config.storage.key.prefix + '/token'
         await localStorage.setItem(key, res.msg.user[0].token)
         dispatch({
           type: TYPES.SET_USER,
@@ -23,7 +23,7 @@ export const doLogin = (email, password) => {
 export const verifyToken = () => {
   return async dispatch => {
     try {
-      let key = config.storage.key.prefix + '/token'
+      const key = config.storage.key.prefix + '/token'
       let token = await localStorage.getItem(key)
       if (typeof token !== 'undefined' && token) {
         let res = await Utility.GetFromServer(config.api.url + '/verify/' + token)

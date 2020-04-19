@@ -10,14 +10,13 @@ const db = new monk('tourneydb_mongo_1/tourneydb')
 d.addHook('preHandler', async (req, reply, done) => {
     console.log(req.raw.url)
   try {
-    if (req.raw.url === '/games' || req.raw.url === '/login' || req.raw.url === '/verify') {
+    if (req.raw.method === 'GET') {
       return
     } else {
-      if (typeof req.body.token !== 'undefined') { 
+      if (typeof req.body.token !== 'undefined') {
         const query = {token: req.body.token}
         const admins = db.get('admins')
-        const res = await admin.find(query)
-        console.log(res)
+        const res = await admins.find(query)
         let valid = false
         if (res.length > 0) {
           valid = true
@@ -25,13 +24,15 @@ d.addHook('preHandler', async (req, reply, done) => {
         if (valid) {
           return
         } else {
-          reply.code(403).send()
+          reply.code(403).send({err:403})
         }
       } else {
-        reply.code(403).send()
+        reply.code(403).send({err:403})
       }
     }
   } catch(e) {
+    console.log(e)
+    reply.code(500).send()
   }
 })
 
