@@ -2,25 +2,27 @@ import HomeScreen from './HomeScreen'
 import LocationScreen from './LocationScreen'
 import TournamentsScreen from './TournamentsScreen'
 
-import React from 'react';
-import clsx from 'clsx';
-import { makeStyles, useTheme } from '@material-ui/core/styles';
-import Drawer from '@material-ui/core/Drawer';
-import AppBar from '@material-ui/core/AppBar';
-import Toolbar from '@material-ui/core/Toolbar';
-import List from '@material-ui/core/List';
-import CssBaseline from '@material-ui/core/CssBaseline';
-import Typography from '@material-ui/core/Typography';
-import Divider from '@material-ui/core/Divider';
-import IconButton from '@material-ui/core/IconButton';
-import MenuIcon from '@material-ui/icons/Menu';
-import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
-import ChevronRightIcon from '@material-ui/icons/ChevronRight';
-import ListItem from '@material-ui/core/ListItem';
-import ListItemIcon from '@material-ui/core/ListItemIcon';
-import ListItemText from '@material-ui/core/ListItemText';
-import InboxIcon from '@material-ui/icons/MoveToInbox';
-import MailIcon from '@material-ui/icons/Mail';
+import React from 'react'
+import clsx from 'clsx'
+import { makeStyles, useTheme } from '@material-ui/core/styles'
+import Drawer from '@material-ui/core/Drawer'
+import AppBar from '@material-ui/core/AppBar'
+import Toolbar from '@material-ui/core/Toolbar'
+import List from '@material-ui/core/List'
+import CssBaseline from '@material-ui/core/CssBaseline'
+import Typography from '@material-ui/core/Typography'
+import Divider from '@material-ui/core/Divider'
+import IconButton from '@material-ui/core/IconButton'
+import MenuIcon from '@material-ui/icons/Menu'
+import ChevronLeftIcon from '@material-ui/icons/ChevronLeft'
+import ChevronRightIcon from '@material-ui/icons/ChevronRight'
+import ListItem from '@material-ui/core/ListItem'
+import ListItemIcon from '@material-ui/core/ListItemIcon'
+import ListItemText from '@material-ui/core/ListItemText'
+import HomeIcon from '@material-ui/icons/Home'
+import LocationIcon from '@material-ui/icons/LocationOn'
+import SettingsIcon from '@material-ui/icons/Settings'
+import LogoutIcon from '@material-ui/icons/ExitToApp'
 
 const drawerWidth = 240;
 
@@ -86,7 +88,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export default function MainScreen() {
+export default function MainScreen(props) {
   const classes = useStyles();
   const theme = useTheme();
   const [open, setOpen] = React.useState(false)
@@ -111,6 +113,10 @@ export default function MainScreen() {
       console.log('component will unmount')
     }
   }, [])
+
+  const handleLogout = () => {
+    props.handleLogout()
+  }
   
   console.log('render')
   return (
@@ -159,18 +165,20 @@ export default function MainScreen() {
         </div>
         <Divider />
         <List>
-          {['Home', 'Location', 'Tournaments'].map((text, index) => (
+          {['Home', 'Location'].map((text, index) => (
             <ListItem button key={text}>
-              <ListItemIcon onClick={() => setScreen(text)} >{index % 2 === 0 ? <InboxIcon /> : <MailIcon />}</ListItemIcon>
+              {text === "Home" && <ListItemIcon onClick={() => setScreen(text)}><HomeIcon /></ListItemIcon>}
+              {text === "Location" && <ListItemIcon onClick={() => setScreen(text)}><LocationIcon /></ListItemIcon>}
               <ListItemText primary={text} onClick={() => setScreen(text)} />
             </ListItem>
           ))}
         </List>
         <Divider />
         <List>
-          {['Preferences', 'Logout'].map((text, index) => (
+          {['Settings', 'Logout'].map((text, index) => (
             <ListItem button key={text}>
-              <ListItemIcon>{index % 2 === 0 ? <InboxIcon /> : <MailIcon />}</ListItemIcon>
+              {text === "Settings" && <ListItemIcon onClick={() => {}}><SettingsIcon /></ListItemIcon>}
+              {text === "Logout" && <ListItemIcon onClick={() => handleLogout}><LogoutIcon /></ListItemIcon>}
               <ListItemText primary={text} />
             </ListItem>
           ))}

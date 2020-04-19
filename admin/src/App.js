@@ -12,13 +12,14 @@ const App = () => {
       dispatch(verifyToken())
   }, [dispatch])
 
-   
+  const handleLogout = () => {
+  } 
   return(
     <div>
     {/*
       <Login />      
       */}
-      <MainScreen />
+      <MainScreen handleLogout={handleLogout} />
     </div>
   )
 }

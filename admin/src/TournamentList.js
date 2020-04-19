@@ -83,7 +83,7 @@ const TournamentList = (props) => {
           <TableBody>
             {Array.isArray(tournaments) && tournaments.map((t, idx) => {
               const now = moment(Date.now())
-              let next_time = moment(parseInt(t.start_time))
+              let next_time = moment(t.start_time)
               while (next_time.isBefore(now.startOf('day'))) {
                 next_time.add(t.frequency, 'week')
               }
