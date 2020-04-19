@@ -4,13 +4,25 @@ import { Table,
   TableCell,
   TableHead,
   TableBody,
-  Button } from '@material-ui/core'
+  Typography,
+  Button,
+} from '@material-ui/core'
 import LocationDetails from './LocationDetails'
 import TournamentList from './TournamentList'
 import Utility from './library/Utility'
 import config from './assets/configs/config'
 import {Snackbar} from '@material-ui/core'
 import MuiAlert from '@material-ui/lab/Alert'
+import { makeStyles } from '@material-ui/core/styles'
+
+
+
+const useStyles = makeStyles({
+  chosen: {
+    backgroundColor:'black',
+    color:'white'
+  }
+})
 
 const Alert = (props) => {
   return <MuiAlert elevation={6} variant="filled" {...props} />
@@ -44,6 +56,7 @@ const LocationScreen = (props) => {
   const [chosenTourneyLoc, setTournamentSelection] = React.useState(null)
   const [open, setOpen] = React.useState(false)
   const [errOpen, setErrOpen] = React.useState(false)
+  const [highlight, setHightlight] = React.useState(-1)
 
 
   React.useEffect(() => {
@@ -101,13 +114,15 @@ const LocationScreen = (props) => {
     setErrOpen(false)
   }
 
-  const handleTournamentSelection = (location_id) => {
+  const handleTournamentSelection = (location_id, idx) => {
+    setHightlight(idx)
     setLocationSelection(-1)
     setTournamentSelection(location_id)
 
   }
 
   const handleLocationSelection = (idx) => {
+    setHightlight(idx)
     setLocationSelection(idx)
     setTournamentSelection(null)
   }
@@ -120,52 +135,57 @@ const LocationScreen = (props) => {
     }
   }
 
+  const classes = useStyles()
+  const DataItem = (props) => {
+    if (props.idx === highlight) {
+      return(<TableCell className={classes.chosen}>{props.text}</TableCell>)
+    } else {
+      return(<TableCell>{props.text}</TableCell>)
+    }
+  }
+
   return (
     <div>
       <div>
       <h3>Location</h3>
       </div>
-      <div>
-        <Button variant="contained" color="primary" onClick={addNew}>Add New</Button>
-        <Table>
-          <TableHead>
-            <TableRow>
-              <TableCell>
-                Name
-              </TableCell>
-              <TableCell>
-              </TableCell>
-              <TableCell>
-              </TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {Array.isArray(locations) && locations.map((loc, idx) => {
-              return(
-                <TableRow key={idx}>
-                  <TableCell>
-                    {loc.name}
-                  </TableCell>
-                  <TableCell>
-                    <Button onClick={() => handleLocationSelection(idx)}>Details</Button>
-                  </TableCell>
-                  <TableCell>
-                    <Button onClick={() => handleTournamentSelection(loc._id)}>Tournaments</Button>
-                  </TableCell>
-                </TableRow>
-              )
-            })}
-          </TableBody>
-        </Table>
-      </div>
-      <div>
-        {chosen > -1 && chosen !== 'new' &&
-          <LocationDetails location={locations[chosen]} handleSave={handleSave} handleCancel={handleCancel} />
-        }
-        {chosen === 'new' && <LocationDetails location={blank} handleSave={handleSave} handleCancel={handleCancel} />
-        }
-        {chosenTourneyLoc !== null && <TournamentList location={chosenTourneyLoc} showSnack={showSnack} /> 
-        }
+      <div style={{display:'flex', flexDirection:'row'}}>
+        <div style={{width:'30%'}}>
+          <Button variant="contained" color="primary" onClick={addNew}>Add New</Button>
+          <Table>
+            <TableHead>
+              <TableRow>
+                <TableCell>
+                  Name
+                </TableCell>
+                <TableCell>
+                </TableCell>
+                <TableCell>
+                </TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {Array.isArray(locations) && locations.map((loc, idx) => {
+                return(
+                  <TableRow key={idx} className={idx === highlight?classes.chosen:''}>
+                    <DataItem text={loc.name} idx={idx} />
+                    <TableCell>
+                      <Button variant="contained" onClick={() => handleLocationSelection(idx)}>Details</Button>
+                    </TableCell>
+                    <TableCell>
+                      <Button variant="contained" onClick={() => handleTournamentSelection(loc._id, idx)}>Tournaments</Button>
+                    </TableCell>
+                  </TableRow>
+                )
+              })}
+            </TableBody>
+          </Table>
+        </div>
+        <div style={{marginLeft:'10%',width:'60%'}}>
+          {chosen > -1 && chosen !== 'new' && <LocationDetails location={locations[chosen]} handleSave={handleSave} handleCancel={handleCancel} /> }
+          {chosen === 'new' && <LocationDetails location={blank} handleSave={handleSave} handleCancel={handleCancel} /> }
+          {chosenTourneyLoc !== null && <TournamentList location={chosenTourneyLoc} showSnack={showSnack} /> }
+        </div>
       </div>
       <div>
         <Snackbar open={open} onClose={handleClose} autoHideDuration={6000} >

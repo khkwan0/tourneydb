@@ -4,6 +4,10 @@ import { TextField, Button } from '@material-ui/core'
 const LocationDetails = (props) => {
   const [details, setDetails] = React.useState(props.location)
 
+  React.useEffect(() => {
+      setDetails(props.location)
+    return () => {}
+  }, [props.location])
   const handleChange = (e) => {
     setDetails({...details, [e.target.name]: e.target.value})
   }

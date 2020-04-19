@@ -80,7 +80,7 @@ d.get('/verify/:token', async (req, reply) => {
 d.get('/locations', async (req, reply) => {
   try {
     const locations = db.get('locations')
-    const res = await locations.find()
+    const res = await locations.find({is_active: true})
     reply.code(200).send({err: 0, msg: res})
   } catch(e) {
     reply.code(500).send({err: 500, msg: e})
@@ -93,6 +93,7 @@ d.post('/location', async (req, reply) => {
       const locations = db.get('locations')
       if (typeof req.body.location._id === 'undefined' || !req.body.location._id) {
         const location = req.body.location
+        location.is_active = true
         delete location._id
         const res = await locations.insert(location)
         reply.code(200).send({err: 0, msg: res})
