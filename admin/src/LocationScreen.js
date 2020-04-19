@@ -4,7 +4,6 @@ import { Table,
   TableCell,
   TableHead,
   TableBody,
-  Typography,
   Button,
 } from '@material-ui/core'
 import LocationDetails from './LocationDetails'
@@ -190,6 +189,9 @@ const LocationScreen = (props) => {
       <div>
         <Snackbar open={open} onClose={handleClose} autoHideDuration={6000} >
           <Alert onClose={handleErrClose} severity="success">SUCCESSFULLY SAVED</Alert>
+        </Snackbar>
+        <Snackbar open={errOpen} onClose={handleClose} autoHideDuration={6000} >
+          <Alert onClose={handleErrClose} severity="error">NOT SAVED</Alert>
         </Snackbar>
       </div>
     </div>

@@ -1,13 +1,7 @@
 import React from 'react'
-import { Table,
-  TableRow,
-  TableCell,
-  TableHead,
-  TableBody,
+import { 
   Button,
   TextField} from '@material-ui/core'
-import Utility from './library/Utility'
-import config from './assets/configs/config'
 
 const tourneyBlank = {
   _id: '',
@@ -32,7 +26,7 @@ const TournamentDetails = (props) => {
       }
       return () => {}
     }
-    , []
+    , [props.addNew, props.tournament]
   )
 
   const handleClose = () => {
