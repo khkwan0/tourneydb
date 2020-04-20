@@ -45,13 +45,14 @@ const LocationScreen = (props) => {
     coordinates: {
       type: 'Point',
       coordinates: [0,0]
-    }
+    },
+    timezone: ''
   }
 
   // state variables
   const [locations, setLocations] = React.useState([])
   const [chosen, setLocationSelection] = React.useState(-1)
-  const [chosenTourneyLoc, setTournamentSelection] = React.useState(null)
+  const [chosenTourneyLoc, setTournamentSelection] = React.useState({})
   const [open, setOpen] = React.useState(false)
   const [errOpen, setErrOpen] = React.useState(false)
   const [highlight, setHightlight] = React.useState(-1)
@@ -112,10 +113,10 @@ const LocationScreen = (props) => {
     setErrOpen(false)
   }
 
-  const handleTournamentSelection = (location_id, idx) => {
+  const handleTournamentSelection = (idx) => {
     setHightlight(idx)
     setLocationSelection(-1)
-    setTournamentSelection(location_id)
+    setTournamentSelection(locations[idx])
 
   }
 
@@ -157,6 +158,12 @@ const LocationScreen = (props) => {
                   Name
                 </TableCell>
                 <TableCell>
+                  Timezone 
+                </TableCell>
+                <TableCell>
+                  Country
+                </TableCell>
+                <TableCell>
                 </TableCell>
                 <TableCell>
                 </TableCell>
@@ -167,11 +174,13 @@ const LocationScreen = (props) => {
                 return(
                   <TableRow key={idx} className={idx === highlight?classes.chosen:''}>
                     <DataItem text={loc.name} idx={idx} />
+                    <DataItem text={loc.timezone} idx={idx} />
+                    <DataItem text={loc.country} idx={idx} />
                     <TableCell>
                       <Button variant="contained" onClick={() => handleLocationSelection(idx)}>Details</Button>
                     </TableCell>
                     <TableCell>
-                      <Button variant="contained" onClick={() => handleTournamentSelection(loc._id, idx)}>Tournaments</Button>
+                      <Button variant="contained" onClick={() => handleTournamentSelection(idx)}>Tournaments</Button>
                     </TableCell>
                   </TableRow>
                 )

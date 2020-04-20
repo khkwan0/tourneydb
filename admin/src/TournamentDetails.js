@@ -2,6 +2,7 @@ import React from 'react'
 import { 
   Button,
   TextField} from '@material-ui/core'
+import moment from 'moment-timezone'
 
 const tourneyBlank = {
   _id: '',
@@ -42,13 +43,15 @@ const TournamentDetails = (props) => {
     props.handleSave(details)
   }
 
+  console.log(details.start_time,props.location.timezone,moment.tz(details.start_time, props.location.timezone).format("YYYY-MM-DDTHH:mm"))
+
   return (
     <div>
       <div>
         <TextField variant="outlined" label="tournament_id" value={details._id} disabled={true} />
         <TextField variant="outlined" onChange={(e) => handleChange(e)} label="Game" name="game" value={details.game} />
         <TextField variant="outlined" onChange={(e) => handleChange(e)} label="Type" name="type" value={details.type} />
-        <TextField variant="outlined" onChange={(e) => handleChange(e)} name="start_time" value={details.start_time} type="datetime-local" />
+        <TextField variant="outlined" onChange={(e) => handleChange(e)} name="start_time" value={moment.tz(details.start_time, props.location.timezone).format('YYYY-MM-DDTHH:mm')} type="datetime-local" />
         <TextField variant="outlined" onChange={(e) => handleChange(e)} label="Frequency" name="frequency" value={details.frequency} />
         <TextField variant="outlined" onChange={(e) => handleChange(e)} label="Fee" name="fee" value={details.fee} />
         <TextField variant="outlined" onChange={(e) => handleChange(e)} label="Currency" name="currency" value={details.currency} />

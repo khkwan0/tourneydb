@@ -7,6 +7,8 @@ d.register(require('fastify-cors'), {origin: 'https://admin.pubgamesdb.com', cre
 
 const db = new monk('tourneydb_mongo_1/tourneydb')
 
+const gLocations = {}
+
 d.addHook('preHandler', async (req, reply, done) => {
     console.log(req.raw.url)
   try {
@@ -41,20 +43,23 @@ d.get('/games/:game', async (req, reply) => {
     let query = {game: req.params.game}
     const tournaments = db.get('tournaments')
     const res = await tournaments.find(query)
-    const tourneys = res.map((tourney, idx) => {
-      const now = Date.now()
-      if(tourney.start_time < now) {
-        let _start_time = moment(tourney.start_time).startOf('day')
-        let remains = tourney.start_time - parseInt(_start_time.format('x'))
+    const tourneys = await Promise.all(res.map(async (tourney, idx) => {
+      const now = moment(Date.now())
+      console.log('now', now.format('YY-MM-DD HH:mm:ss'))
+      let _start_time = moment(tourney.start_time).startOf('day')
+      if (_start_time.isBefore(now)) {
+        let remains = parseInt(moment(tourney.start_time).format('x')) - parseInt(_start_time.format('x'))
         let _now = moment(now).startOf('day')
-        while (_now > _start_time) {
+        while (_now.isAfter(_start_time)) {
           _start_time.add(tourney.frequency, 'week') 
         }
         _start_time.add(remains, 'milliseconds')
         tourney.start_time = parseInt(_start_time.format('x'))
       } 
+      const loc_id = tourney.location_id
+      tourney.location = await getLocationData(loc_id)
       return tourney
-    })
+    }))
     reply.code(200).send({err: 0, msg: tourneys})
   } catch(e) {
     reply.code(500).send()
@@ -159,8 +164,13 @@ d.post('/tournament', async (req, reply) => {
   if (typeof req.body.tournament !== 'undefined') {
     try {
       const tournaments = db.get('tournaments')
+      let timezone = "Etc/GMT"
+      if (typeof req.body.timezone !== 'undefined') {
+        timezone = req.body.timezone
+      }
       if (typeof req.body.tournament._id === 'undefined' || !req.body.tournament._id) {
         const _details = {...req.body.tournament}
+        _details.start_time = parseInt(moment.tz(req.body.tournament.start_time, timezone).format('x'))
         if (typeof _details._id  !== 'undefined') {
           delete _details._id
         }
@@ -168,6 +178,7 @@ d.post('/tournament', async (req, reply) => {
         const res = await tournaments.insert(_details)
         reply.code(200).send({err: 0, msg: res})
       } else {
+        req.body.tournament.start_time = parseInt(moment.tz(req.body.tournament.start_time, timezone).format('x'))
         const res = await tournaments.update({_id: req.body.tournament._id}, {$set: req.body.tournament})
         reply.code(200).send({err: 0, msg: res})
       }
@@ -179,6 +190,27 @@ d.post('/tournament', async (req, reply) => {
     reply.code(404).send()
   }
 })
+
+getLocationData = async loc_id => {
+  // check local
+  if (typeof gLocations[loc_id] !== 'undefined') {
+    return gLocations[loc_id]
+  } else {
+    try {
+      const _locations = db.get('locations')
+      const res = await _locations.findOne({_id: loc_id})
+      if (typeof res._id !== 'undefined') {
+        gLocations[res._id] = res
+        return res
+      } else {
+        throw new Error(e)
+      }
+    } catch(e) {
+      console.log(e)
+      throw new Error(e)
+    }
+  }
+}
 
 // there should be only one user per email/token
 verifyUser = async (collection = 'admins', query = {}) => {

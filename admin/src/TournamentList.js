@@ -20,10 +20,9 @@ const TournamentList = (props) => {
   React.useEffect(() => {
     const fetchTourney = async () => {
       try {
-        const res = await Utility.GetFromServer(config.api.url + '/tournaments/'+props.location)
+        const res = await Utility.GetFromServer(config.api.url + '/tournaments/'+props.location._id)
         if (res.err === 0) {
-        console.log(res.msg)
-        setTournaments(res.msg)
+          setTournaments(res.msg)
         }
       } catch(e) {
         console.log(e)
@@ -32,7 +31,7 @@ const TournamentList = (props) => {
     fetchTourney()
     return () => {
     }
-  }, [props.location])
+  }, [props.location._id])
 
   const handleEditTournament = (idx) => {
     setChosenTournament(idx)
@@ -45,8 +44,8 @@ const TournamentList = (props) => {
 
   const handleSave = async details => {
     try {
-      details.location_id = props.location
-      const res = await Utility.PostToServer(config.api.url + '/tournament', {tournament: details})
+      details.location_id = props.location._id
+      const res = await Utility.PostToServer(config.api.url + '/tournament', {tournament: details, timezone: props.location.timezone})
       if (typeof res.msg._id !== 'undefined') { // save new tourney success
         details._id = res.msg._id
         const _tournaments = Array.from(tournaments)
@@ -102,10 +101,10 @@ const TournamentList = (props) => {
         </Table>
       </div>
       {addNew &&
-        <TournamentDetails addNew={addNew} close={handleCloseTournamentDetails} handleSave={handleSave}/>
+        <TournamentDetails addNew={addNew} close={handleCloseTournamentDetails} handleSave={handleSave} location={props.location} />
       }
       {!addNew && chosenTournament > -1 && 
-        <TournamentDetails tournament={tournaments[chosenTournament]} close={handleCloseTournamentDetails} handleSave={handleSave} />
+        <TournamentDetails tournament={tournaments[chosenTournament]} close={handleCloseTournamentDetails} handleSave={handleSave} location={props.location} />
       }
     </div>
   )
