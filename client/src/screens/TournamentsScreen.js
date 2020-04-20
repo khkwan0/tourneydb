@@ -39,7 +39,7 @@ class TournamentsScreen extends Component {
 
   getDataFromServer = async () => {
     try {
-      let res_raw = await fetch('https://api.pubgamesdb.com/games' + this.props.route.params.game, {
+      let res_raw = await fetch('https://api.pubgamesdb.com/games/' + this.props.route.params.game, {
         method:'GET',
         headers: {
           'Accept': 'application/json'
@@ -89,7 +89,7 @@ class TournamentsScreen extends Component {
               <View><Text style={{color:'white'}}>{tourney.location.phone}</Text></View>
               <View><Text style={{color:'white'}}>{tourney.location.email}</Text></View>
               <View><Text style={{color:'white'}}>{tourney.location.messenger_id}</Text></View>
-              <View><Text style={{color:'white'}}>{tourney.rules}</Text></View>
+              <View><Text style={{color:'white'}}>{tourney.notes}</Text></View>
             </View>
             <View style={{flex: 1, alignItems: 'center'}}>
                 <TouchableOpacity onPress={this.hideDetails} style={styles.modalButtonWide}>
@@ -112,7 +112,7 @@ class TournamentsScreen extends Component {
         {!this.state.show_details && !this.state.loading &&
           <View>
             <View style={{alignItems: 'center', marginTop:'20%'}}>
-              <Text style={{color:'white', fontSize:40, fontFamily:'PassionOne-Regular'}}>shootahs</Text>
+              <Text style={{color:'white', fontSize:40, fontFamily:'PassionOne-Regular'}}>PUB GAMES DB</Text>
             </View>
             <View style={{alignItems:'center', marginTop:8}}>
               <Text style={{color:'white', fontSize:15}}>{this.props.route.params.game} BALL TOURNAMENTS</Text>
@@ -123,11 +123,12 @@ class TournamentsScreen extends Component {
                 <View key={tourney._id} style={{marginTop:10}}>
                   <Card style={{backgroundColor: 'black'}} onPress={() => this.showDetails(idx)} title={tourney.location.name}>
                     <View style={{width:'80%', display:'flex', paddingLeft:20, paddingTop: 20, paddingBottom:20}}>
-                      <View><Text style={{color:'white', fontSize: 30}}>{tourney.location.name}</Text></View>
+                      <View><Text style={{color:'white', fontSize: 25}}>{tourney.location.name}</Text></View>
                       <View><Text style={{color:'white'}}>{tourney.type.toUpperCase()}</Text></View>
-                      <View><Text style={{color:'white'}}>{moment.tz(tourney.start_time, 'Asia/Bangkok').format('ddd MMM Do @ h:mm a')}</Text></View>
+                      <View><Text style={{color:'white'}}>{moment.tz(tourney.start_time, tourney.location.timezone).format('ddd MMM Do @ h:mm a')}</Text></View>
+                      <View><Text style={{color:'white'}}>Timezone: {tourney.location.timezone}</Text></View>
                       <View><Text style={{color:'yellow'}}>{tourney.fee} {tourney.currency}</Text></View>
-                      <View style={{display:'flex', flexDirection:'row', justifyContent:'space-between' }}><Text style={{color:'white'}}>{tourney.max} players</Text><Text style={{color:'white'}}>Details</Text></View>
+                      <View style={{display:'flex', flexDirection:'row', justifyContent:'space-between' }}><Text style={{color:'white'}}>{tourney.max_players} players</Text><Text style={{color:'white'}}>Details</Text></View>
                     </View>
                   </Card>
                 </View>
