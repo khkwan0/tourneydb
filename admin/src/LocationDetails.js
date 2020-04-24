@@ -29,6 +29,7 @@ const LocationDetails = (props) => {
       <TextField variant="outlined" label="City" name="city" value={details.city} onChange={(e) => handleChange(e)} />
       <TextField variant="outlined" label="State" name="state" value={details.state} onChange={(e) => handleChange(e)} />
       <TextField variant="outlined" label="Country" name="country" value={details.country} onChange={(e) => handleChange(e)} />
+      <TextField variant="outlined" label="Timezone" name="timezone" value={details.timezone} onChange={(e) => handleChange(e)} />
       <TextField variant="outlined" label="Zip" name="zip" value={details.zip} onChange={(e) => handleChange(e)} />
       <TextField variant="outlined" label="Latitude" name="latitude" value={details.latitude} onChange={(e) => handleChange(e)} />
       <TextField variant="outlined" label="Longitude" name="longitude" value={details.longitude} onChange={(e) => handleChange(e)} />
