@@ -3,6 +3,7 @@ import {View, Text, TouchableOpacity, StyleSheet, ActivityIndicator, SafeAreaVie
 import {Card} from 'react-native-paper'
 import moment from 'moment-timezone'
 import LinearGradient from 'react-native-linear-gradient'
+import Geolocation from '@react-native-community/geolocation'
 
 const TournamentsScreen = (props) => {
   const [tournaments, setTournaments] = React.useState([])
@@ -10,6 +11,7 @@ const TournamentsScreen = (props) => {
   const [loading, setLoading] = React.useState(true)
 
   React.useEffect(() => {
+    /*
     getData = async () => {
       try {
         const res = await getDataFromServer(props.route.params.game)
@@ -19,8 +21,7 @@ const TournamentsScreen = (props) => {
       } catch(e) {
         console.log(e)
       }
-    },
-    getData()
+    }*/
     const unsubscribe = props.navigation.addListener('focus', async () => {
       setIdx(-1)
       setLoading(true)
@@ -33,13 +34,15 @@ const TournamentsScreen = (props) => {
 
   getDataFromServer = async (game) => {
     try {
-      let res_raw = await fetch('https://api.pubgamesdb.com/games/' + game, {
-        method:'GET',
+      const res_raw = await fetch('https://api.pubgamesdb.com/games/' + game, {
+        method:'POST',
+        body: JSON.stringify({position: await getPosition()}),
         headers: {
-          'Accept': 'application/json'
+          'Accept': 'application/json',
+          'Content-Type': 'application/json'
         }
       })
-      let res = await res_raw.json()
+      const res = await res_raw.json()
       if (res.err === 0) {
         return res.msg
       } else {
@@ -48,6 +51,12 @@ const TournamentsScreen = (props) => {
     } catch(e) {
       throw new Error(e)
     }
+  }
+
+  const getPosition = (options) => {
+    return new Promise((resolve, reject) => {
+      Geolocation.getCurrentPosition(resolve, reject, options)
+    })
   }
 
   const MyPseudoModal = () => {
