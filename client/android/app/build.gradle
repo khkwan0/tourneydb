@@ -132,8 +132,8 @@ android {
         applicationId "com.tourneydb"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 3
-        versionName "20.04.2402"
+        versionCode 5
+        versionName "20.04.2702"
     }
     splits {
         abi {
