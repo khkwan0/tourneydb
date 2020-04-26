@@ -1,15 +1,17 @@
-import React, {Component} from 'react'
-import {View, Text, TouchableOpacity, StyleSheet, ActivityIndicator, SafeAreaView, ScrollView} from 'react-native'
+import React from 'react'
+import {View, Text, TouchableOpacity, StyleSheet, ActivityIndicator, SafeAreaView, ScrollView, Button} from 'react-native'
 import {Card} from 'react-native-paper'
 import moment from 'moment-timezone'
 import LinearGradient from 'react-native-linear-gradient'
 import Geolocation from '@react-native-community/geolocation'
+import MapScreen from './MapScreen'
 
 const TournamentsScreen = (props) => {
   const [tournaments, setTournaments] = React.useState([])
   const [idx, setIdx] = React.useState(-1)
   const [loading, setLoading] = React.useState(true)
-
+  const [showMap, _setShowMap] = React.useState(false)
+  const [_pos, setPos] = React.useState({})
   React.useEffect(() => {
     /*
     getData = async () => {
@@ -33,6 +35,8 @@ const TournamentsScreen = (props) => {
   }, [])
 
   getDataFromServer = async (game) => {
+    const posit = await getPosition()
+    setPos(posit)
     try {
       const res_raw = await fetch('https://api.pubgamesdb.com/games/' + game, {
         method:'POST',
@@ -90,21 +94,34 @@ const TournamentsScreen = (props) => {
       </View>
     )
   }
+
+  const setShowMap = flag => {
+    _setShowMap(flag)
+  }
+
   return(
     <SafeAreaView style={{flex: 1}}>
     <LinearGradient start={{x:0, y:1}} end={{x:1, y:0}} colors={['purple', '#3b5998', '#192f6a']} style={{flex:1}}>
+      <View>
+        <Button title={showMap?'Back To List View':'Show Map'} onPress={() => {setShowMap(!showMap)}}></Button>
+      </View>
       <View style={{alignItems: 'center', marginTop:'20%'}}>
         <Text style={{color:'white', fontSize:40, fontFamily:'PassionOne-Regular'}}>PUB GAMES DB</Text>
       </View>
       <View style={{alignItems:'center', marginTop:8}}>
         <Text style={{color:'white', fontSize:15}}>{props.route.params.game} BALL TOURNAMENTS</Text>
       </View>
-    {loading &&
+    {showMap &&
+      <View>
+        <MapScreen position={_pos} tournaments={tournaments} />
+      </View>
+    }
+    {loading && !showMap &&
       <View style={{flex: 1,justifyContent: 'center', alignItems: 'center'}}>
         <ActivityIndicator size="large" color="#ffffff" />
       </View>
     }
-    {idx < 0 && !loading &&
+    {idx < 0 && !loading && !showMap &&
       <ScrollView>
         <View style={{marginTop: 20, marginLeft: 20, marginRight:20}}>
         {tournaments.map((tourney, _idx) => {
@@ -126,7 +143,7 @@ const TournamentsScreen = (props) => {
         </View>
       </ScrollView>
     }
-    {idx > -1 && !loading &&
+    {idx > -1 && !loading && !ShowMap &&
      <MyPseudoModal /> 
     }
     </LinearGradient>

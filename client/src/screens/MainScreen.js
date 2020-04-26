@@ -1,7 +1,8 @@
-import React, { Component } from 'react'
-import {Image, StyleSheet} from 'react-native'
+import React from 'react'
+import {Image, StyleSheet, View} from 'react-native'
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs'
 import TournamentsScreen from './TournamentsScreen'
+import MapView from 'react-native-maps'
 
 const Tab = createBottomTabNavigator()
 
