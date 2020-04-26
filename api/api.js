@@ -8,11 +8,11 @@ d.register(require('fastify-cors'), {origin: 'https://admin.pubgamesdb.com', cre
 const db = new monk('tourneydb_mongo_1/tourneydb')
 
 const gLocations = {}
+const dist = 5000 //5KM
 
-d.addHook('preHandler', async (req, reply, done) => {
-    console.log(req.raw.url)
+d.addHook('preHandler', async (req, reply) => {
   try {
-    if (req.raw.method === 'GET' || req.raw.url === '/login' || req.raw.url === '/verify') {
+    if (req.raw.method === 'GET' || req.raw.url === '/login' || req.raw.url === '/verify' || req.raw.url.indexOf('/games') === 0) {
       return
     } else {
       if (typeof req.body.token !== 'undefined') {
@@ -38,14 +38,38 @@ d.addHook('preHandler', async (req, reply, done) => {
   }
 })
 
-d.get('/games/:game', async (req, reply) => {
+d.post('/games/:game', async (req, reply) => {
   try {
-    let query = {game: req.params.game}
+    let max_distance = parseInt(dist) // 5KM
+    if (typeof req.body.max_distance !== 'undefined') {
+      max_distance = parseInt(req.body.max_distance)
+    }
+
+    let position = req.body.position
+    let lat = null
+    let lng = null
+    if (typeof position.coords.latitude !== 'undefined') {
+      lat = parseFloat(position.coords.latitude)
+    }
+    if (typeof position.coords.longitude !== 'undefined') {
+      lng = parseFloat(position.coords.longitude)
+    }
+    if (!lat || !lng) {  // set default to Bangkok
+      lat = 13.735104
+      lng = 100.5622373
+    }
+
+    // get all locations within max_distance radius
+    const locations = db.get('locations')
+    const loc_res = await locations.find({location: {$near: {$geometry: {type: "Point", coordinates:[lng, lat]}, $maxDistance: max_distance}}})
+    const _locs = loc_res.map(loc => loc._id.toString())
+
+    // get games
+    query = {game: req.params.game, location_id: {$in: _locs} }
     const tournaments = db.get('tournaments')
     const res = await tournaments.find(query)
     const tourneys = await Promise.all(res.map(async (tourney, idx) => {
       const now = moment(Date.now())
-      console.log('now', now.format('YY-MM-DD HH:mm:ss'))
       let _start_time = moment(tourney.start_time).startOf('day')
       if (_start_time.isBefore(now)) {
         let remains = parseInt(moment(tourney.start_time).format('x')) - parseInt(_start_time.format('x'))
@@ -60,8 +84,10 @@ d.get('/games/:game', async (req, reply) => {
       tourney.location = await getLocationData(loc_id)
       return tourney
     }))
+    tourneys.sort((a,b) => (a.start_time > b.start_time)?1:-1)
     reply.code(200).send({err: 0, msg: tourneys})
   } catch(e) {
+    console.log(e)
     reply.code(500).send()
   }
 })
@@ -124,10 +150,6 @@ d.post('/location', async (req, reply) => {
       const locations = db.get('locations')
       if (typeof req.body.location._id === 'undefined' || !req.body.location._id) {
         const location = req.body.location
-        location.coords = {
-          type: 'Point',
-          coordinates: [req.body.lng, req.body.lat]
-        }
         location.is_active = true
         delete location._id
         const res = await locations.insert(location)

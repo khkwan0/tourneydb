@@ -42,7 +42,7 @@ const LocationScreen = (props) => {
     phone: '',
     social: '',
     email: '',
-    coordinates: {
+    location: {
       type: 'Point',
       coordinates: [0,0]
     },
@@ -82,6 +82,13 @@ const LocationScreen = (props) => {
   }
   
   const handleSave = async details => {
+    if (typeof details.location === 'undefined') {
+      details.location = { type: 'Point', coordinates: [0,0] }
+    }
+    details.latitude = parseFloat(details.latitude)
+    details.longitude = parseFloat(details.longitude)
+    details.location.coordinates[0] = parseFloat(details.longitude)
+    details.location.coordinates[1] = parseFloat(details.latitude)
     const toSend = {
       location: details
     }
@@ -146,7 +153,7 @@ const LocationScreen = (props) => {
   return (
     <div>
       <div>
-      <h3>Location</h3>
+      <h2>Location</h2>
       </div>
       <div style={{display:'flex', flexDirection:'row'}}>
         <div style={{width:'30%'}}>

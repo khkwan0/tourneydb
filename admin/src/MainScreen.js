@@ -1,6 +1,7 @@
 import HomeScreen from './HomeScreen'
 import LocationScreen from './LocationScreen'
 import TournamentsScreen from './TournamentsScreen'
+import PreferencesScreen from './PreferencesScreen'
 
 import React from 'react'
 import clsx from 'clsx'
@@ -97,7 +98,8 @@ export default function MainScreen(props) {
 	const screens = {
     "Home": <HomeScreen />,
     "Location": <LocationScreen />,
-    "Tournaments": <TournamentsScreen />
+    "Tournaments": <TournamentsScreen />,
+    "Preferences": <PreferencesScreen />
 	}
 
   const handleDrawerOpen = () => {
@@ -174,9 +176,9 @@ export default function MainScreen(props) {
         </List>
         <Divider />
         <List>
-          {['Settings', 'Logout'].map((text, index) => (
+          {['Preferences', 'Logout'].map((text, index) => (
             <ListItem button key={text}>
-              {text === "Settings" && <ListItemIcon onClick={() => {}}><SettingsIcon /></ListItemIcon>}
+              {text === "Preferences" && <ListItemIcon onClick={() => {setScreen(text)}}><SettingsIcon /></ListItemIcon>}
               {text === "Logout" && <ListItemIcon onClick={() => handleLogout()}><LogoutIcon /></ListItemIcon>}
               <ListItemText primary={text} />
             </ListItem>

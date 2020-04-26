@@ -8,6 +8,7 @@ const LocationDetails = (props) => {
       setDetails(props.location)
     return () => {}
   }, [props.location])
+
   const handleChange = (e) => {
     setDetails({...details, [e.target.name]: e.target.value})
   }
