@@ -176,13 +176,14 @@ export default function MainScreen(props) {
         </List>
         <Divider />
         <List>
-          {['Preferences', 'Logout'].map((text, index) => (
-            <ListItem button key={text}>
-              {text === "Preferences" && <ListItemIcon onClick={() => {setScreen(text)}}><SettingsIcon /></ListItemIcon>}
-              {text === "Logout" && <ListItemIcon onClick={() => handleLogout()}><LogoutIcon /></ListItemIcon>}
-              <ListItemText primary={text} />
+            <ListItem button key="Preferences">
+              <ListItemIcon onClick={() => setScreen("Preferences")}><SettingsIcon /></ListItemIcon>
+              <ListItemText primary="Preferences"  onClick={()=> setScreen("Preferences")} />
             </ListItem>
-          ))}
+            <ListItem button key="Logout">
+              <ListItemIcon onClick={() => handleLogout()}><LogoutIcon /></ListItemIcon>
+              <ListItemText primary={"Logout"} onClick={() => handleLogout()} />
+            </ListItem>
         </List>
       </Drawer>
       <main className={classes.content}>
