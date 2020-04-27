@@ -112,7 +112,7 @@ export default function MainScreen(props) {
 
   React.useEffect(() => {
     return () => {
-      console.log('component will unmount')
+//      console.log('component will unmount')
     }
   }, [])
 
