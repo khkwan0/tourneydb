@@ -7,7 +7,7 @@ const config = require('./config')
 
 d.register(require('fastify-cors'), {origin: 'https://admin.pubgamesdb.com', credentials: true})
 
-const db = new monk('tourneydb_mongo_1/tourneydb')
+const db = new monk('mongodb://'+config.db.mongo.user + ':' + config.db.mongo.password + '@tourneydb_mongo_1/'+config.db.mongo.db+'?authSource='+config.db.mongo.db+'&replicaSet=rs0')
 
 const gLocations = {}
 const dist = 5000 //5KM
@@ -263,7 +263,7 @@ getLocationData = async loc_id => {
 verifyUser = async (collection = 'admins', query = {}) => {
   try {
     const _collection = db.get(collection)
-    let res = await _collection.find(query, '-password')
+    const res = await _collection.find(query, '-password')
     if (res.length === 1) {
       let token = uuid.v4()
       await _collection.update({_id: res[0]._id}, {$set: {token: token}})
@@ -273,6 +273,7 @@ verifyUser = async (collection = 'admins', query = {}) => {
       return null
     }
   } catch(e) {
+    console.log(e)
     return null
   }
 }

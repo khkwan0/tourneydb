@@ -4,6 +4,8 @@ services:
     image: mongo
     volumes:
      - ./mongo:/data/db
+    entrypoint: ["/usr/bin/mongod", "--auth", "--dbpath", "/data/db", "--bind_ip", "localhost,tourneydb_mongo_1", "--replSet", "rs0"]
+#    entrypoint: ["/usr/bin/mongod", "--dbpath", "/data/db", "--bind_ip", "localhost,tourneydb_mongo_1", "--replSet", "rs0"]
   api:
     build: ./api
     volumes:
