@@ -37,6 +37,7 @@ const TournamentsScreen = (props) => {
   getDataFromServer = async (game) => {
     const posit = await getPosition()
     setPos(posit)
+    console.log('getdatafromserver')
     try {
       const res_raw = await fetch('https://api.pubgamesdb.com/games/' + game, {
         method:'POST',
@@ -143,7 +144,7 @@ const TournamentsScreen = (props) => {
         </View>
       </ScrollView>
     }
-    {idx > -1 && !loading && !ShowMap &&
+    {idx > -1 && !loading && !showMap &&
      <MyPseudoModal /> 
     }
     </LinearGradient>

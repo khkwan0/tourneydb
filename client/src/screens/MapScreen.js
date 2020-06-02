@@ -2,7 +2,13 @@ import React from 'react'
 import { View } from 'react-native'
 import MapView from 'react-native-maps'
 
+let timeoutId = null
 const MapScreen = (props) => {
+
+  const handleRegionChange= (e) => {
+    console.log(e)
+  }
+
   return(
     <View style={{height:400, width: 400, justifyContent: 'flex-end', alignItems:'center'}}>
       <MapView style={{height:'100%',width:'100%'}}
@@ -13,6 +19,7 @@ const MapScreen = (props) => {
           latitudeDelta: 0.0922,
           longitudeDelta: 0.0421,
         }}
+        onRegionChangeComplete={handleRegionChange}
       >
         {props.tournaments.map((tourney, idx) => {
           return(
