@@ -2,10 +2,12 @@ const d = require('fastify')({logger:true})
 const monk = require('monk')
 const moment = require('moment-timezone')
 const uuid = require('uuid')
+const crypto = require('crypto')
+const config = require('./config')
 
 d.register(require('fastify-cors'), {origin: 'https://admin.pubgamesdb.com', credentials: true})
 
-const db = new monk('tourneydb_mongo_1/tourneydb')
+const db = new monk('mongodb://'+config.db.mongo.user + ':' + config.db.mongo.password + '@tourneydb_mongo_1/'+config.db.mongo.db+'?authSource='+config.db.mongo.db+'&replicaSet=rs0')
 
 const gLocations = {}
 const dist = 5000 //5KM
@@ -95,9 +97,10 @@ d.post('/games/:game', async (req, reply) => {
 d.post('/login', async (req, reply) => {
   try {
     if (typeof req.body !== 'undefined' && typeof req.body.email!== 'undefined' && typeof req.body.password !== 'undefined') {
-      let query = {email: req.body.email.toLowerCase(), password: req.body.password}
+      let hash = await doScrypt(req.body.password)
+      let query = {email: req.body.email.toLowerCase(), password: hash.toString('hex')}
       const res = await verifyUser('admins', query)
-      if (res.length === 1) {
+      if (res && res.length === 1) {
         let payload = {
           user: res,
           token: res.token
@@ -213,6 +216,28 @@ d.post('/tournament', async (req, reply) => {
   }
 })
 
+d.post('/pwd/admin', async (req, reply) => {
+  if (typeof req.body.token !== 'undefined' && req.body.old_password !== 'undefined' && req.body.new_password !== 'undefined') {
+    try {
+      const admins = db.get('admins')
+      const old_hash = await doScrypt(req.body.old_password)
+      const new_hash = await doScrypt(req.body.new_password)
+      const token = req.body.token
+      const res = await admins.update({token: token, password: old_hash}, {$set: {password: new_hash}})
+      if (res.n === 1 && res.nModified === 1) {
+        reply.code(200).send({err: 0, msg: 'ok'})
+      } else {
+        reply.code(404).send({err: 404, msg: 'not found'})
+      }
+    } catch(e) {
+      console.log(e)
+      reply.code(500).send({err: 500, msg: e})
+    }
+  } else {
+    respond404(reply)
+  }
+})
+
 getLocationData = async loc_id => {
   // check local
   if (typeof gLocations[loc_id] !== 'undefined') {
@@ -238,7 +263,7 @@ getLocationData = async loc_id => {
 verifyUser = async (collection = 'admins', query = {}) => {
   try {
     const _collection = db.get(collection)
-    let res = await _collection.find(query, '-password')
+    const res = await _collection.find(query, '-password')
     if (res.length === 1) {
       let token = uuid.v4()
       await _collection.update({_id: res[0]._id}, {$set: {token: token}})
@@ -248,9 +273,28 @@ verifyUser = async (collection = 'admins', query = {}) => {
       return null
     }
   } catch(e) {
+    console.log(e)
     return null
   }
 }
+
+const doScrypt = (pwd) => {
+  return new Promise((resolve, reject) => {
+      try {
+        crypto.scrypt(pwd, config.salt, 64, (err, derived) => {
+          if (err) {
+            reject(err)
+          } else {
+            resolve(derived.toString('hex'))
+          }
+        })
+      } catch(e) {
+        console.log(e)
+        reject(e)
+      }
+  })
+}
+
 
 respond404 = (reply) => {
   reply.code(404).send({err:404, msg: 'not found'})
