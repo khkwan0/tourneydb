@@ -1,19 +1,22 @@
 import React from 'react'
-import {Image, StyleSheet, View} from 'react-native'
+import {Image, StyleSheet, View, Text} from 'react-native'
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs'
 import TournamentsScreen from './TournamentsScreen'
-import MapView from 'react-native-maps'
+import VenuesScreen from './VenueScreen'
 
 const Tab = createBottomTabNavigator()
 
 const MainScreen = () => {
+  return(<View><Text>test</Text></View>)
+  /*
   return(
     <Tab.Navigator tabBarOptions={{showLabel: false, inactiveBackgroundColor: 'black', activeBackgroundColor: 'purple', style:styles.tab, lazy: true}} >
-      <Tab.Screen name="EightBall" component={TournamentsScreen} initialParams={{game: '8'}} options={{tabBarIcon: () => <Image source={require('../assets/images/eightball.png')} style={styles.tabIcon} />}} />
-      <Tab.Screen name="NineBall" component={TournamentsScreen} initialParams={{game: '9'}} options={{tabBarIcon: () => <Image source={require('../assets/images/nineball.png')} style={styles.tabIcon} />}} />
+      <Tab.Screen name="Venues" component={VenuesScreen} />
+      <Tab.Screen name="Tournaments" component={TournamentsScreen}  />
       <Tab.Screen name="TenBall" component={TournamentsScreen} initialParams={{game: '10'}} options={{tabBarIcon: () => <Image source={require('../assets/images/tenball.png')} style={styles.tabIcon} />}} />
     </Tab.Navigator>
   )
+  */
 }
 
 const styles = StyleSheet.create({

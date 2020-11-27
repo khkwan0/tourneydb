@@ -1,9 +1,10 @@
 import React from 'react'
 import {View, Text, TouchableOpacity, StyleSheet, ActivityIndicator, SafeAreaView, ScrollView, Button} from 'react-native'
 import {Card} from 'react-native-paper'
-import moment from 'moment-timezone'
+import {DateTime} from 'luxon'
 import LinearGradient from 'react-native-linear-gradient'
-import Geolocation from '@react-native-community/geolocation'
+import geo from '../library/geo'
+import net from '../library/net'
 import MapScreen from './MapScreen'
 
 const TournamentsScreen = (props) => {
@@ -35,18 +36,10 @@ const TournamentsScreen = (props) => {
   }, [])
 
   getDataFromServer = async (game) => {
-    const posit = await getPosition()
+    const posit = await geo.getPosition()
     setPos(posit)
-    console.log('getdatafromserver')
     try {
-      const res_raw = await fetch('https://api.pubgamesdb.com/games/' + game, {
-        method:'POST',
-        body: JSON.stringify({position: await getPosition()}),
-        headers: {
-          'Accept': 'application/json',
-          'Content-Type': 'application/json'
-        }
-      })
+      const res = net.Post('/games/' + game, {position: posit})
       const res = await res_raw.json()
       if (res.err === 0) {
         return res.msg
@@ -56,12 +49,6 @@ const TournamentsScreen = (props) => {
     } catch(e) {
       throw new Error(e)
     }
-  }
-
-  const getPosition = (options) => {
-    return new Promise((resolve, reject) => {
-      Geolocation.getCurrentPosition(resolve, reject, options)
-    })
   }
 
   const MyPseudoModal = () => {
@@ -132,7 +119,7 @@ const TournamentsScreen = (props) => {
                 <View style={{width:'80%', display:'flex', paddingLeft:20, paddingTop: 20, paddingBottom:20}}>
                   <View><Text style={{color:'white', fontSize: 25}}>{tourney.location.name}</Text></View>
                   <View><Text style={{color:'white'}}>{tourney.type.toUpperCase()}</Text></View>
-                  <View><Text style={{color:'white'}}>{moment.tz(tourney.start_time, tourney.location.timezone).format('ddd MMM Do @ h:mm a')}</Text></View>
+                  <View><Text style={{color:'white'}}>{DateTime.locale().setZone(tourney.location.timezone).toLocaleString(DateTime.DATETIME_FULL)}</Text></View>
                   <View><Text style={{color:'white'}}>Timezone: {tourney.location.timezone}</Text></View>
                   <View><Text style={{color:'yellow'}}>{tourney.fee} {tourney.currency}</Text></View>
                   <View style={{display:'flex', flexDirection:'row', justifyContent:'space-between' }}><Text style={{color:'white'}}>{tourney.max_players} players</Text><Text style={{color:'white'}}>Details</Text></View>

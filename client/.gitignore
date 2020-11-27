@@ -58,3 +58,6 @@ buck-out/
 # CocoaPods
 /ios/Pods/
 AndroidManifest.xml
+configs/
+config.js
+assets/
