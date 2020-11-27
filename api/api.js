@@ -10,7 +10,7 @@ d.register(require('fastify-cors'), {origin: 'https://admin.pubgamesdb.com', cre
 const db = new monk('mongodb://'+config.db.mongo.user + ':' + config.db.mongo.password + '@tourneydb_mongo_1/'+config.db.mongo.db+'?authSource='+config.db.mongo.db+'&replicaSet=rs0')
 
 const gLocations = {}
-const dist = 5000 //5KM
+const DIST = 5000 //5KM
 
 d.addHook('preHandler', async (req, reply) => {
   try {
@@ -42,7 +42,7 @@ d.addHook('preHandler', async (req, reply) => {
 
 d.post('/games/:game', async (req, reply) => {
   try {
-    let max_distance = parseInt(dist) // 5KM
+    let max_distance = parseInt(DIST) // 5KM
     if (typeof req.body.max_distance !== 'undefined') {
       max_distance = parseInt(req.body.max_distance)
     }
@@ -67,9 +67,13 @@ d.post('/games/:game', async (req, reply) => {
     const _locs = loc_res.map(loc => loc._id.toString())
 
     // get games
-    query = {game: req.params.game, location_id: {$in: _locs} }
+    let query = {location_id: {$in: _locs}}
+    if (req.params.game !== undefined && req.params.game) {
+      query = {game: req.params.game, location_id: {$in: _locs} }
+    }
     const tournaments = db.get('tournaments')
     const res = await tournaments.find(query)
+    console.log(res)
     const tourneys = await Promise.all(res.map(async (tourney, idx) => {
       const now = moment(Date.now())
       let _start_time = moment(tourney.start_time).startOf('day')
@@ -210,6 +214,39 @@ d.post('/tournament', async (req, reply) => {
     } catch(e) {
       console.log(e)
       reply.code(500).send({err: 500, msg: e})
+    }
+  } else {
+    reply.code(404).send()
+  }
+})
+
+d.get('/venues', async (req, reply) => {
+  if (req.query.pos !== undefined && req.query.pos) {
+    try {
+      const position = JSON.parse(new Buffer.from(req.query.pos, "base64").toString("ascii"))
+      let lat = null
+      let lng = null
+      if (typeof position.coords.latitude !== 'undefined') {
+        lat = parseFloat(position.coords.latitude)
+      }
+      if (typeof position.coords.longitude !== 'undefined') {
+        lng = parseFloat(position.coords.longitude)
+      }
+      if (!lat || !lng) {  // set default to Bangkok
+        lat = 13.735104
+        lng = 100.5622373
+      }
+      const locations = db.get('locations')
+      max_distance = parseInt(DIST) // 5KM
+      if (req.query.max_distance !== undefined) {
+        max_distance = parseInt(req.query.max_distance)
+      }
+      //const loc_res = await locations.find({location: {$near: {$geometry: {type: "Point", coordinates:[lng, lat]}, $maxDistance: max_distance}}})
+      const loc_res = await locations.aggregate([{"$geoNear":{"near":{"type":"Point", "coordinates": [lng, lat]}, "maxDistance": max_distance, "spherical": true, "distanceField":"distance"}}])
+      reply.code(200).send({err: 0, msg: loc_res})
+    } catch(e) {
+      console.log(e)
+      reply.code(404).send()
     }
   } else {
     reply.code(404).send()

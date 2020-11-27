@@ -18,4 +18,5 @@ services:
       - ./admin:/usr/src/app
   www:
     build: ./www
-    entrypoint: ["node", "index.js"]
+    volumes:
+      - ./www:/usr/src/app

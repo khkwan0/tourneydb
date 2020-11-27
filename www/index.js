@@ -1,4 +1,4 @@
-const d = require('fastify')()
+const d = require('fastify')({logger:true})
 const path = require('path')
 
 d.register(require('fastify-static'), {
@@ -14,6 +14,12 @@ d.get('/privacy', (req, reply) => {
   reply.code(200).header('Content-Type','text/html; charset=UTF-8').sendFile('privacy.html')
 })
 
-d.listen(24421, '0.0.0.0.', (err) => {
-  console.log(err)
-})
+const start = async () => {
+  try {
+    await d.listen(24421, '0.0.0.0')
+  } catch(e) {
+    console.log(e)
+  }
+}
+
+start()
