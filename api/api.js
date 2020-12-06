@@ -253,6 +253,41 @@ d.get('/venues', async (req, reply) => {
   }
 })
 
+d.post('/venue', async (req, reply) => {
+  try {
+    if (req.body.payload !== undefined && req.body.payload ) {
+      let valid_input = true
+      const payload = req.body.payload
+      const position = payload.position
+      if (position.coords === undefined || position.coords.latitude === undefined || position.coords.longitude === undefined) {
+        valid_input = false
+      }
+      const info = payload.info
+      if (payload === undefined || payload.name === undefined) {
+        valid_input = false
+      }
+      if (valid_input) {
+        const locations = db.get('locations')
+        const toInsert = {
+          type: "Point",
+          coordinates: [position.longitude, position.latitude],
+          ...info
+        }
+        const res = await locations.insert(toInsert)
+        if (res.nInserted === 1) {
+          reply.code(200).send({err: 0})
+        } else {
+          reply.code(500).send({err: -1})
+        }
+      } else {
+        reply.code(404).send()
+      }
+    }
+  } catch(e) {
+    reply.code(500).send()
+  }
+})
+
 d.post('/pwd/admin', async (req, reply) => {
   if (typeof req.body.token !== 'undefined' && req.body.old_password !== 'undefined' && req.body.new_password !== 'undefined') {
     try {
