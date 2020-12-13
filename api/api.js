@@ -14,7 +14,7 @@ const DIST = 5000 //5KM
 
 d.addHook('preHandler', async (req, reply) => {
   try {
-    if (req.raw.method === 'GET' || req.raw.url === '/login' || req.raw.url === '/verify' || req.raw.url.indexOf('/games') === 0) {
+    if (req.raw.method === 'GET' || req.raw.url === '/login' || req.raw.url === '/verify' || req.raw.url.indexOf('/games') === 0 || (req.raw.method === 'POST' && req.raw.url === '/venue')) {
       return
     } else {
       if (typeof req.body.token !== 'undefined') {
@@ -73,7 +73,6 @@ d.post('/games/:game', async (req, reply) => {
     }
     const tournaments = db.get('tournaments')
     const res = await tournaments.find(query)
-    console.log(res)
     const tourneys = await Promise.all(res.map(async (tourney, idx) => {
       const now = moment(Date.now())
       let _start_time = moment(tourney.start_time).startOf('day')
@@ -263,18 +262,24 @@ d.post('/venue', async (req, reply) => {
         valid_input = false
       }
       const info = payload.info
-      if (payload === undefined || payload.name === undefined) {
+      if (info === undefined || info.name === undefined) {
         valid_input = false
       }
       if (valid_input) {
         const locations = db.get('locations')
+        info.is_active = true
+        info.verified = false
+        info.creation_time = Date.now()
+        info.last_update = info.creation_time
         const toInsert = {
-          type: "Point",
-          coordinates: [position.longitude, position.latitude],
+          location: {
+            type: "Point",
+            coordinates: [position.coords.longitude, position.coords.latitude],
+          },
           ...info
         }
         const res = await locations.insert(toInsert)
-        if (res.nInserted === 1) {
+        if (res._id !== undefined && res._id !== null) {
           reply.code(200).send({err: 0})
         } else {
           reply.code(500).send({err: -1})
@@ -284,6 +289,7 @@ d.post('/venue', async (req, reply) => {
       }
     }
   } catch(e) {
+    console.log(e)
     reply.code(500).send()
   }
 })
