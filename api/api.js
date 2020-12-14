@@ -69,10 +69,12 @@ d.post('/games/:game', async (req, reply) => {
     // get games
     let query = {location_id: {$in: _locs}}
     if (req.params.game !== undefined && req.params.game) {
-      query = {game: req.params.game, location_id: {$in: _locs} }
+      query = {game: req.params.game + ' Ball', location_id: {$in: _locs} }
     }
+    console.log(query)
     const tournaments = db.get('tournaments')
     const res = await tournaments.find(query)
+    console.log(res)
     const tourneys = await Promise.all(res.map(async (tourney, idx) => {
       const now = moment(Date.now())
       let _start_time = moment(tourney.start_time).startOf('day')
