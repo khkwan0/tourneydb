@@ -6,6 +6,7 @@ const crypto = require('crypto')
 const config = require('./config')
 
 d.register(require('fastify-cors'), {origin: 'https://admin.pubgamesdb.com', credentials: true})
+d.register(require('fastify-jwt'), {secret: config.jwt.secret})
 
 const db = new monk('mongodb://'+config.db.mongo.user + ':' + config.db.mongo.password + '@tourneydb_mongo_1/'+config.db.mongo.db+'?authSource='+config.db.mongo.db+'&replicaSet=rs0')
 
@@ -14,9 +15,15 @@ const DIST = 5000 //5KM
 
 d.addHook('preHandler', async (req, reply) => {
   try {
-    if (req.raw.method === 'GET' || req.raw.url === '/login' || req.raw.url === '/verify' || req.raw.url.indexOf('/games') === 0 || (req.raw.method === 'POST' && req.raw.url === '/venue')) {
+    if (
+      (req.raw.method === 'GET' && (req.raw.url.indexOf('/venues') === 0 || req.raw.url.indexOf('/games') === 0 || req.raw.url.indexOf('/tournaments') === 0)) ||
+      (req.raw.method === 'POST' && (req.raw.url === '/venue' || req.raw.url === '/admin/login' || req.raw.url === '/login'))
+    ) {
       return
     } else {
+      await req.jwtVerify()
+    }
+    /*
       if (typeof req.body.token !== 'undefined') {
         const query = {token: req.body.token}
         const admins = db.get('admins')
@@ -34,20 +41,21 @@ d.addHook('preHandler', async (req, reply) => {
         reply.code(403).send({err:403})
       }
     }
+    */
   } catch(e) {
     console.log(e)
-    reply.code(500).send()
+    reply.code(404).send()
   }
 })
 
-d.post('/games/:game', async (req, reply) => {
+d.get('/games', async (req, reply) => {
   try {
     let max_distance = parseInt(DIST) // 5KM
-    if (typeof req.body.max_distance !== 'undefined') {
-      max_distance = parseInt(req.body.max_distance)
+    if (typeof req.query.max_distance !== 'undefined') {
+      max_distance = parseInt(req.query.max_distance)
     }
 
-    let position = req.body.position
+    let position = JSON.parse(new Buffer.from(req.query.pos, 'base64').toString('ascii'))
     let lat = null
     let lng = null
     if (typeof position.coords.latitude !== 'undefined') {
@@ -68,13 +76,11 @@ d.post('/games/:game', async (req, reply) => {
 
     // get games
     let query = {location_id: {$in: _locs}}
-    if (req.params.game !== undefined && req.params.game) {
-      query = {game: req.params.game + ' Ball', location_id: {$in: _locs} }
+    if (req.query.game !== undefined && req.query.game) {
+      query = {game: req.query.game + ' Ball', location_id: {$in: _locs} }
     }
-    console.log(query)
     const tournaments = db.get('tournaments')
     const res = await tournaments.find(query)
-    console.log(res)
     const tourneys = await Promise.all(res.map(async (tourney, idx) => {
       const now = moment(Date.now())
       let _start_time = moment(tourney.start_time).startOf('day')
@@ -99,12 +105,12 @@ d.post('/games/:game', async (req, reply) => {
   }
 })
 
-d.post('/login', async (req, reply) => {
+d.post('/admin/login', async (req, reply) => {
   try {
     if (typeof req.body !== 'undefined' && typeof req.body.email!== 'undefined' && typeof req.body.password !== 'undefined') {
       let hash = await doScrypt(req.body.password)
       let query = {email: req.body.email.toLowerCase(), password: hash.toString('hex')}
-      const res = await verifyUser('admins', query)
+      const res = await verifyUser('users', query)
       if (res && res.length === 1) {
         let payload = {
           user: res,
@@ -123,16 +129,51 @@ d.post('/login', async (req, reply) => {
   }
 })
 
-d.get('/verify/:token', async (req, reply) => {
+d.post('/login', async (req, reply) => {
   try {
-    if (typeof req.params.token !== 'undefined') {
-      let query = {token: req.params.token}
-      let res = await verifyUser('admins', query)
-      if (res) {
-        reply.code(200).send({err: 0, msg: res})
+    if (typeof req.body !== 'undefined' && typeof req.body.email!== 'undefined' && typeof req.body.password !== 'undefined') {
+      let hash = await doScrypt(req.body.password)
+      let query = {email: req.body.email.toLowerCase(), password: hash.toString('hex')}
+      const res = await verifyUser('users', query)
+      if (res && res.length === 1) {
+        let payload = {
+          user: res,
+          token: res.token
+        }
+        reply.code(200).send({err: 0, msg: payload})
       } else {
         respond404(reply)
       }
+    } else {
+      respond404(reply)
+    }
+  } catch(e) {
+    console.log(e)
+    reply.code(500).send({err: 500, msg: e})
+  }
+})
+
+d.get('/verify/', async (req, reply) => {
+  try {
+    const query = {_id: req.user._id}
+    let res = await verifyUser('admins', query)
+    if (res) {
+      reply.code(200).send({err: 0, msg: res})
+    } else {
+      respond404(reply)
+    }
+  } catch(e) {
+    console.log(e)
+    reply.code(500).send({err: 500, msg: e})
+  }
+})
+
+d.get('/verify/admin', async (req, reply) => {
+  try {
+    const query = {_id: req.user._id}
+    let res = await verifyUser('users', query)
+    if (res) {
+      reply.code(200).send({err: 0, msg: res})
     } else {
       respond404(reply)
     }
@@ -340,12 +381,12 @@ getLocationData = async loc_id => {
 }
 
 // there should be only one user per email/token
-verifyUser = async (collection = 'admins', query = {}) => {
+verifyUser = async (collection, query = {}) => {
   try {
     const _collection = db.get(collection)
-    const res = await _collection.find(query, '-password')
+    const res = await _collection.find(query, '-password, -token')
     if (res.length === 1) {
-      let token = uuid.v4()
+      const token = d.jwt.sign(res[0])
       await _collection.update({_id: res[0]._id}, {$set: {token: token}})
       res[0].token = token
       return res
